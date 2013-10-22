@@ -33,3 +33,4 @@ pip-log.txt
 env/
 
 *~
+api_details.py
