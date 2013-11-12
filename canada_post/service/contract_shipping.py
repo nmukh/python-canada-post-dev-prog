@@ -271,12 +271,14 @@ class CreateShipment(ServiceBase):
         add_child("intended-method-of-payment", settlement).text = "Account"
 
         headers = {
-            'Accept': "application/vnd.cpc.shipment-v2+xml",
-            'Content-type': "application/vnd.cpc.shipment-v2+xml",
+            'Accept': "application/vnd.cpc.shipment-v4+xml",
+            'Content-type': "application/vnd.cpc.shipment-v4+xml",
+            'Authorization': "Basic {0}:{1}".format("56b04e6aad70ef2d", "241ca19f1eb2b26b6e7247"),
             'Accept-language': "en-CA",
         }
         url = self.get_url()
         self.log.info("Using url %s", url)
+        self.log.info("headers:\n%s", headers)
         request = etree.tostring(shipment, pretty_print=self.auth.debug)
         self.log.debug("Request xml: %s", request)
         response = requests.post(url=url, data=request, headers=headers,
