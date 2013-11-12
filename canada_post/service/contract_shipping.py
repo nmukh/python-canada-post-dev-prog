@@ -507,10 +507,12 @@ class GetShipments(ServiceBase):
             self.log.info(
                 "Getting non-transmitted shipments in group_id {0}".format(
                     group_id))
+            params['group_id'] = group_id
         elif manifest is not None:
             self.log.info(
                 "Getting shipments transmitted to manifest {0}".format(
                     manifest))
+            params['manifest'] = manifest
         else:
             self.log.info("Getting non-contract shipments")
             params['noManifest'] = 'true'
