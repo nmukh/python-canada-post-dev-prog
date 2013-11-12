@@ -62,7 +62,8 @@ class TestContractShipping(unittest.TestCase):
         pass
     
     def test_get_shipments(self):
-        pass
+        cp_req = contract_shipping.GetShipments(api_details.AUTH)
+        cp_req()
     
     def test_void_shipment(self):
         pass

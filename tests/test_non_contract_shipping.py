@@ -1,5 +1,8 @@
 # coding=utf-8
 
+from canada_post.api import CanadaPostAPI
+from . import api_details
+
 import unittest
 
 class TestNonContractShipping(unittest.TestCase):
@@ -8,8 +11,22 @@ class TestNonContractShipping(unittest.TestCase):
     Posts's Non-Contract Shipping documentation
     """
     
-    def setUp(self):
-        pass
+    #def setUp(self):
+    
+    #def test_interface_auth(self):
+    #    """ Test the CanadaPostAPI interface constructon with Auth object """
+    #    interface = CanadaPostAPI(auth = api_details.AUTH)
+    #    self.assertEqual(interface.auth.username, api_details.AUTH.username)
+    
+    def test_interface_kwargs(self):
+        """ Test the CanadaPostAPI interface constructor with key word args"""
+        interface = CanadaPostAPI(
+            customer_number=api_details.AUTH.customer_number,
+            username=api_details.AUTH.username,
+            password=api_details.AUTH.password,
+            contract_number=None,
+            dev=api_details.AUTH.dev)
+        self.assertEqual(interface.auth.username, api_details.AUTH.username)
     
     def test_create_nc_shipment(self):
         """
@@ -36,6 +53,7 @@ class TestNonContractShipping(unittest.TestCase):
         """
         Tests Get Non-Contract Shipments
         """
+        #interface ...
         pass
     
     def test_get_nc_shipment(self):

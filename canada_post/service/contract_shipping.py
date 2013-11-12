@@ -464,3 +464,60 @@ class VoidShipment(CallLinkService):
                             ".VoidShipment")
     link_rel = 'self'
     method_name = 'delete'
+
+class GetShipments(ServiceBase):
+    """
+    As per canada post webservices:
+    
+    * To retrieve links to a collection of shipments not yet transmitted 
+      (members of a group).
+    
+    * To retrieve links to a collection of shipments that has been transmitted
+      (members of a manifest).
+    
+    * To retrieve a list of shipments where no manifest is required. (not here
+      because non-contract)
+    """
+    URL = "https://{XX}/rs/{mailed_by_customer}/{mobo}/shipment"
+    log = logging.getLogger('canada_post.service.contract_shipping'
+                            '.GetShipments')
+    
+    def get_url(self):
+        return self.URL.format(
+            XX=self.get_server(),
+            mailed_by_customer=self.auth.customer_number,
+            mobo=self.auth.customer_number)
+    
+    def __call__(self, date_str=None, limit=None, group_id=None, 
+                 manifest=None):
+        """
+        * dat_Str: in `YYYYMMDD` format
+        
+        * limit: max number of links to request
+        
+        * group_id: get shipments in this group-id
+        
+        * manifest: get shipments in this manifest (ignored if group_id)
+        
+        Not that if no group_id or manifest is provided than noManifest is 
+        implied
+        """
+        params = {}
+        if group_id is not None:
+            self.log.info(
+                "Getting non-transmitted shipments in group_id {0}".format(
+                    group_id))
+        elif manifest is not None:
+            self.log.info(
+                "Getting shipments transmitted to manifest {0}".format(
+                    manifest))
+        else:
+            self.log.info("Getting non-contract shipments")
+            params['noManifest'] = 'true'
+        
+        response = requests.get(self.get_url(), params=params, 
+                                auth=self.userpass())
+        self.log.info("Canada Post returned with status code %d",
+                      response.status_code)
+        self.log.debug("CanadaPost returned with content: %s", 
+                       response.content)
