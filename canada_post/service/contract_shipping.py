@@ -491,13 +491,13 @@ class GetShipments(ServiceBase):
     def __call__(self, date_str=None, limit=None, group_id=None, 
                  manifest=None):
         """
-        * dat_Str: in `YYYYMMDD` format
+        * ``dat_Str``: in `YYYYMMDD` format
         
-        * limit: max number of links to request
+        * ``limit``: max number of links to request
         
-        * group_id: get shipments in this group-id
+        * ``group_id``: get shipments in this group-id
         
-        * manifest: get shipments in this manifest (ignored if group_id)
+        * ``manifest``: get shipments in this manifest (ignored if group_id)
         
         Not that if no group_id or manifest is provided than noManifest is 
         implied
