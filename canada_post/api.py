@@ -57,8 +57,8 @@ class CanadaPostAPI(object):
                       not include the 'Authorization' header as it is inserted
                       in this function.
         
-        ``body`` : TODO ... does nothing at this point, but will be used to
-                   compile the {XML} body ot the request
+        ``body`` : TODO. A dictionary-style object used to compile the XML 
+                   document to replace {XML}
         
         ``kwargs`` : keyword arguments that will be inserted into 
                      {query string}
@@ -67,10 +67,11 @@ class CanadaPostAPI(object):
         _[#] Canada Post, "REST Fundamentals of Canada Post Web Services"
         """
         # TODO: Currently returns a 'requests' response, but should return an
-        #      instance of 'CanadaPostResponse'
+        #       instance of 'CanadaPostResponse'
+        
+        service = ServiceBase(self.auth)
         
         # Compile the url using correct endpoint
-        service = ServiceBase(self.auth)
         cp_url = "https://{XX}/rs/{mailed_by_customer}/{url}".format(
             XX=service.get_server(),
             mailed_by_customer=self.auth.customer_number,
@@ -82,9 +83,7 @@ class CanadaPostAPI(object):
         #       'headers.keys()' if POST and "Accept" in 'headers.keys()' if 
         #       GET
         
-        # compile xml document
-        # TODO: Maybe take a dictionary of xml element tree as argument to this
-        #       fucntion
+        # TODO: compile xml document
         
         # make call
         logger.debug("put the entire HTTP request here")
@@ -104,15 +103,13 @@ class CanadaPostAPI(object):
     
     
     def nc_get_shipments(self, from_date, to_date=None):
-        """ Shortcut to the "Get Non-Contract Shipments" method 
+        """ Shortcut to "Get Non-Contract Shipments - REST"
         
         ``from_date`` and ``to_date`` in "YYYYMMDDHHMM" format
         
-        no body required
+        no XML body required
         """
         # TODO: accept actual python date objects instead of date strings
-        # TODO: Does this have the same exact result as regular get shipments
-        #       with the noManifest=true param?
         headers = {
             'Accept': "application/vnd.cpc.ncshipment+xml",
             'Content-Type': 'application/vnd.cpc.ncshipment+xml',
