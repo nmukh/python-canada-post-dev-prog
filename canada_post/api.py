@@ -1,16 +1,21 @@
 """
 Central API module
 """
+import logging
 import requests
 
 from canada_post import PROD, Auth
 from canada_post.service import ServiceBase
-from canada_post.service.contract_shipping import (CreateShipment, VoidShipment,
+from canada_post.service.contract_shipping import (CreateShipment, 
+                                                   VoidShipment,
                                                    TransmitShipments,
                                                    GetManifest, GetArtifact,
                                                    GetManifestShipments)
 from canada_post.service.rating import (GetRates)
 from canada_post.errors import CanadaPostError
+
+logger = logging.getLogger('canada_post.api')
+
 
 class CanadaPostAPI(object):
     """ The principle interface for the user """
@@ -39,7 +44,8 @@ class CanadaPostAPI(object):
             + {HTTP header variables}
             + {XML}
         
-        ``method`` : HTTP method to use. Replaces {method}
+        ``method`` : The name of a 'requests' function call representing the
+                     HTTP method to use. i.e Replaces {method}
         
         ``mobo`` : if true, {mobo} will be populate, otherwise it will be
                    removed
@@ -60,13 +66,14 @@ class CanadaPostAPI(object):
         
         _[#] Canada Post, "REST Fundamentals of Canada Post Web Services"
         """
-        
+        # TODO: Currently returns a 'requests' response, but should return an
+        #      instance of 'CanadaPostResponse'
         
         # Compile the url using correct endpoint
         service = ServiceBase(self.auth)
         cp_url = "https://{XX}/rs/{mailed_by_customer}/{url}".format(
             XX=service.get_server(),
-            mailed_by_customer=self.auth.username,
+            mailed_by_customer=self.auth.customer_number,
             url=url)
         
         # compile HTTP headers
@@ -80,11 +87,20 @@ class CanadaPostAPI(object):
         #       fucntion
         
         # make call
-        try:
-            return requests.post(url=cp_url, params=kwargs, data=body, 
-                                 headers=headers, auth=auth)
-        except CanadaPostError as e:
-            raise e
+        logger.debug("put the entire HTTP request here")
+        assert(method in ["get", "post", "delete"])
+        request_method = getattr(requests, method)
+        response = request_method(url=cp_url, params=kwargs, data=body, 
+                                  headers=headers, auth=auth)
+        logger.debug("Canada Post Response Body:\n {0}".format(
+            response.content))
+        if response.status_code not in [200, 202, 204, 304]:
+            raise CanadaPostError(
+                response.status_code,
+                "Canada Post Error! code : {0}; message : {1}".format(
+                    "xxx", "blah blah blah"))
+        
+        return response
     
     
     def nc_get_shipments(self, from_date, to_date=None):
@@ -94,8 +110,9 @@ class CanadaPostAPI(object):
         
         no body required
         """
-        #TODO: Does this have the same exact result as regular get shipments
-        #      with the noManifest=true param?
+        # TODO: accept actual python date objects instead of date strings
+        # TODO: Does this have the same exact result as regular get shipments
+        #       with the noManifest=true param?
         headers = {
             'Accept': "application/vnd.cpc.ncshipment+xml",
             'Content-Type': 'application/vnd.cpc.ncshipment+xml',
@@ -106,4 +123,6 @@ class CanadaPostAPI(object):
         if to_date is not None:
             params["to"] = to_date
         
-        return self._call("GET", False, "ncshipment", headers, "", **params)
+        logger.info("Asking for non-contract shipments from {0} to {1}".format(
+                    from_date, to_date))
+        return self._call("get", False, "ncshipment", headers, None, **params)
