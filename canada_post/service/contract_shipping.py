@@ -277,7 +277,6 @@ class CreateShipment(ServiceBase):
         }
         url = self.get_url()
         self.log.info("Using url %s", url)
-        self.log.info("headers:\n%s", headers)
         request = etree.tostring(shipment, pretty_print=self.auth.debug)
         self.log.debug("Request xml: %s", request)
         response = requests.post(url=url, data=request, headers=headers,
