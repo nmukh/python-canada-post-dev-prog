@@ -1,9 +1,9 @@
 # coding=utf-8
+import unittest
+from datetime import date
 
 from canada_post.api import CanadaPostAPI
 from . import api_details
-
-import unittest
 
 class TestNonContractShipping(unittest.TestCase):
     """
@@ -54,7 +54,8 @@ class TestNonContractShipping(unittest.TestCase):
         """
         Tests Get Non-Contract Shipments
         """
-        self.interface.get_shipments()
+        from_date = date(1960, 1, 1).strftime("%Y%m%d0000")
+        self.interface.nc_get_shipments(from_date)
         
     
     def test_get_nc_shipment(self):
