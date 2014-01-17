@@ -427,9 +427,16 @@ class GetManifestShipments(ServiceBase):
                             '.GetManifestShipments')
     def __call__(self, manifest):
         self.log.info("Getting shipments for manifest %s", str(manifest))
-        link = manifest.links['manifestShipments']['href']
+        link = manifest.links['manifestShipments']
         self.log.info("Using link %s", link)
-        response = requests.get(link, auth=self.userpass())
+        url = link['href']
+        headers = {
+            'Accept': link['media-type'],
+            'Accept-language': 'en-CA',
+        }
+        self.log.debug("using url: %s", url)
+        self.log.debug("headers: %s", headers)
+        response = requests.get(url, headers=headers, auth=self.userpass())
         self.log.info("Canada Post returned with status code %d",
                       response.status_code)
         self.log.debug("CanadaPost returned with content: %s", response.content)
