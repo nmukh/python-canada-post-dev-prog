@@ -393,7 +393,13 @@ class GetManifest(ServiceBase):
                             '.GetManifest')
     def __call__(self, link):
         self.log.info("Getting manifest from link %s", link)
-        response = requests.get(link['href'], auth=self.userpass())
+        url = link['href']
+        headers = {
+            'Accept': link['media-type'],
+            'Accept-language': 'en-CA',
+        }
+        response = requests.get(link['href'], headers=headers,
+                                auth=self.userpass())
         self.log.info("Canada Post returned with status code %d",
                       response.status_code)
         self.log.debug("Canada Post returned with content %s", response.content)
