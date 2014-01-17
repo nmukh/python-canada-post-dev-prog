@@ -445,8 +445,13 @@ class GetArtifact(ServiceBase):
     def __call__(self, obj):
         self.log.info("Getting artifact for object %s", str(obj))
         link = obj.links[obj.artifact_type]
+        url = link['href']
+        headers = {
+            'Accept': "application/pdf",
+        }
         self.log.info("Using link %s", link)
         res = requests.get(link['href'], auth=self.userpass())
+        res = requests.get(url, headers=headers, auth=self.userpass())
         self.log.info("Canada Post returned with status code %d",
                       res.status_code)
         self.log.debug("Canada Post returned with content: %s", res.content)
