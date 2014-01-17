@@ -398,6 +398,8 @@ class GetManifest(ServiceBase):
             'Accept': link['media-type'],
             'Accept-language': 'en-CA',
         }
+        self.log.debug("using url: %s", url)
+        self.log.debug("headers: %s", headers)
         response = requests.get(link['href'], headers=headers,
                                 auth=self.userpass())
         self.log.info("Canada Post returned with status code %d",
@@ -450,7 +452,8 @@ class GetArtifact(ServiceBase):
             'Accept': "application/pdf",
         }
         self.log.info("Using link %s", link)
-        res = requests.get(link['href'], auth=self.userpass())
+        self.log.debug("Using url: %s", url)
+        self.log.debug("Headers: %s", headers)
         res = requests.get(url, headers=headers, auth=self.userpass())
         self.log.info("Canada Post returned with status code %d",
                       res.status_code)
