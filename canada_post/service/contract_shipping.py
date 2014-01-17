@@ -4,6 +4,7 @@ https://www.canadapost.ca/cpo/mc/business/productsservices/developers/services/s
 """
 import logging
 from tempfile import NamedTemporaryFile
+from time import sleep
 from lxml import etree
 import requests
 from canada_post.errors import Wait
@@ -407,6 +408,12 @@ class GetManifest(ServiceBase):
         self.log.debug("Canada Post returned with content %s", response.content)
         if not response.ok:
             response.raise_for_status()
+
+        if response.status_code == 202:
+            # retry later
+            self.log.info("Transmission not ready. Waiting 1 minute")
+            sleep(60)
+            return self(link)
 
         restree = etree.XML(response.content.replace(' xmlns="',
                                                      ' xmlnamespace="'))
