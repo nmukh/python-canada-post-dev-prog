@@ -393,7 +393,15 @@ class GetManifest(ServiceBase):
                             '.GetManifest')
     def __call__(self, link):
         self.log.info("Getting manifest from link %s", link)
-        response = requests.get(link['href'], auth=self.userpass())
+        url = link['href']
+        headers = {
+            'Accept': link['media-type'],
+            'Accept-language': 'en-CA',
+        }
+        self.log.debug("using url: %s", url)
+        self.log.debug("headers: %s", headers)
+        response = requests.get(link['href'], headers=headers,
+                                auth=self.userpass())
         self.log.info("Canada Post returned with status code %d",
                       response.status_code)
         self.log.debug("Canada Post returned with content %s", response.content)
@@ -439,8 +447,14 @@ class GetArtifact(ServiceBase):
     def __call__(self, obj):
         self.log.info("Getting artifact for object %s", str(obj))
         link = obj.links[obj.artifact_type]
+        url = link['href']
+        headers = {
+            'Accept': "application/pdf",
+        }
         self.log.info("Using link %s", link)
-        res = requests.get(link['href'], auth=self.userpass())
+        self.log.debug("Using url: %s", url)
+        self.log.debug("Headers: %s", headers)
+        res = requests.get(url, headers=headers, auth=self.userpass())
         self.log.info("Canada Post returned with status code %d",
                       res.status_code)
         self.log.debug("Canada Post returned with content: %s", res.content)
